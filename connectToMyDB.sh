@@ -1,0 +1,1 @@
+mysql -p -u burkeow -h mysql.scss.tcd.ie burkeow_db 

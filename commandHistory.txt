@@ -1,0 +1,190 @@
+1: CREATE TABLE Team (Team_ID INT NOT NULL, Name VARCHAR(255) NOT NULL, Ranking INT NOT NULL, Owner VARCHAR(255) NOT NULL, PRIMARY KEY (Team_ID), UNIQUE (Name), UNIQUE (Ranking), CONSTRAINT check_ranking CHECK (Ranking >=1 AND Ranking <= (COUNT(*))));
+
+2: CREATE TABLE Driver (Driver_num INT NOT NULL, Name VARCHAR(255) NOT NULL, Age INT NOT NULL, Blood_type VARCHAR(3) NOT NULL, Street VARCHAR(255) NOT NULL, Town VARCHAR(255) NOT NULL, Country VARCHAR(100) NOT NULL, Team_ID INT NOT NULL, PRIMARY KEY (Driver_num), FOREIGN KEY (Team_ID) REFERENCES Team (Team_ID), CONSTRAINT check_age CHECK (Age >= 16 AND Age <= 100), CONSTRAINT check_blood_type CHECK (Blood_type IN ('O+','O-','A+','A-','B+','B-','AB+','AB-')));
+
+3: ALTER TABLE Team DROP INDEX Ranking;
+
+4: CREATE TABLE Car (Car_ID INT NOT NULL, Engine_num INT NOT NULL, Driver_num INT NOT NULL, PRIMARY KEY (Car_ID), UNIQUE (Engine_num), UNIQUE (Driver_num), FOREIGN KEY (Driver_num) REFERENCES Driver (Driver_num));
+
+5: CREATE TABLE Mechanic (Mechanic_ID INT NOT NULL, Name VARCHAR(255) NOT NULL, Team_ID INT NOT NULL, Age INT NOT NULL, Driver_num INT NOT NULL, Car_ID INT NOT NULL, Blood_type VARCHAR(3) NOT NULL, PRIMARY KEY (Mechanic_ID), FOREIGN KEY (Team_ID) REFERENCES Team (Team_ID), FOREIGN KEY (Driver_num) REFERENCES Driver (Driver_num), FOREIGN KEY (Car_ID) REFERENCES Car (Car_ID), CONSTRAINT check_blood_type CHECK (Blood_type IN ('O+','O-','A+','A-','B+','B-','AB+','AB-')));
+
+6: CREATE TABLE Event (Track_name VARCHAR(255) NOT NULL, Year INT NOT NULL, Country VARCHAR(100) NOT NULL, PRIMARY KEY (Track_name, Year), CONSTRAINT check_year CHECK (Year >= 1970 AND Year <= 2050));
+
+7: ALTER TABLE Mechanic ADD CONSTRAINT check_age CHECK (Age >= 16 AND Age <= 100);
+
+8: CREATE TABLE Race (Track_name VARCHAR(255) NOT NULL, Year INT NOT NULL, Driver_num INT NOT NULL, Position INT NOT NULL, PRIMARY KEY (Track_name, Year, Driver_num), FOREIGN KEY (Track_name, Year) REFERENCES Event (Track_name, Year), FOREIGN KEY (Driver_num) REFERENCES Driver (Driver_num), CONSTRAINT check_position CHECK (Position > 0));
+
+9: CREATE TABLE Car_Race (Track_name VARCHAR(255) NOT NULL, Year INT NOT NULL, Car_ID INT NOT NULL, PRIMARY KEY (Track_name, Year, Car_ID), FOREIGN KEY (Track_name, Year) REFERENCES Event (Track_name, Year), FOREIGN KEY (Car_ID) REFERENCES Car (Car_ID), CONSTRAINT check_year CHECK (Year >= 1970 AND Year <= 2050));
+
+10: ALTER TABLE Race ADD CONSTRAINT check_year CHECK (Year >= 1970 AND Year <= 2050);
+
+11: RENAME TABLE Race TO Driver_result;
+
+12: INSERT INTO Team VALUES (124, 'Max Racing', 2, 'Exor');
+    INSERT INTO Team VALUES (298, 'Red Bull', 1, 'Dietrich Mateschitz');
+    INSERT INTO Team VALUES (310, 'Richard Mille Racing', 3, 'Richard Mille');
+    INSERT INTO Team VALUES (201, 'Aston Martin Racing', 4, 'David Richards');
+    INSERT INTO Team VALUES (301, 'McLaren', 5, 'Amanda McLaren');
+    INSERT INTO Team VALUES (410, 'Ferrari', 6, 'Exor');
+
+13: INSERT INTO Driver VALUES (1246, 'Tom Masey', 22, 'A+', 'Harcourt Street', 'London', 'England', 124);
+    INSERT INTO Driver VALUES (1283, 'Alan Wright', 24, 'O-', 'Seaview Road', 'Glasgow', 'Scotland', 298);
+    INSERT INTO Driver VALUES (4821, 'Jean le Pen', 21, 'AB-', 'Rue de Seine', 'Paris', 'France', 310);
+    INSERT INTO Driver VALUES (382, 'Oscar Daly', 26, 'A-', 'Main Street', 'Hull', 'England', 201);
+    INSERT INTO Driver VALUES (294, 'Tim Parker', 28, 'AB+', 'Park Lane', 'New York', 'USA', 310);
+    INSERT INTO Driver VALUES (521, 'Frank Hill', 26, 'O-', 'Coast Road', 'Galway', 'Ireland', 298);
+    INSERT INTO Driver VALUES (820, 'Matt West', 29, 'B-', 'Green Lane', 'Brisbane', 'Australia', 301);
+    INSERT INTO Driver VALUES (904, 'Rick Walker', 26, 'B-', 'Park Lane', 'New York', 'USA', 410);
+    
+14: INSERT INTO Car VALUES (12, 124683, 1246);
+    INSERT INTO Car VALUES (4, 248932, 1283);
+    INSERT INTO Car VALUES (8, 149682, 4821);
+    INSERT INTO Car VALUES (2, 24962, 382);
+    INSERT INTO Car VALUES (6, 102346, 294);
+    INSERT INTO Car VALUES (1, 82985, 521);
+    INSERT INTO Car VALUES (9, 111125, 820);
+    INSERT INTO Car VALUES (3, 696325, 904);
+
+15: INSERT INTO Mechanic VALUES (129, 'Tom Arnold', 124, 32, 1246, 12, 'AB+');
+    INSERT INTO Mechanic VALUES (260, 'Rick Martin', 298, 36, 1283, 4, 'AB-');
+    INSERT INTO Mechanic VALUES (410, 'Tom Wright', 310, 29, 4821, 8, 'O-');
+    INSERT INTO Mechanic VALUES (560, 'Alan Spencer', 201, 31, 382, 2, 'A+');
+    INSERT INTO Mechanic VALUES (111, 'Dave Knight', 310, 32, 294, 6, 'A+');
+    INSERT INTO Mechanic VALUES (130, 'Sam Hill', 298, 30, 521, 1, 'O+');
+    INSERT INTO Mechanic VALUES (266, 'Greg Day', 301, 29, 820, 9, 'A-');
+    INSERT INTO Mechanic VALUES (310, 'Rick Hill', 410, 30, 904, 3, 'AB+');
+    INSERT INTO Mechanic VALUES (400, 'Jared Graves', 298, 31, 1283, 4, 'O-');
+    INSERT INTO Mechanic VALUES (811, 'Curtis Keene', 124, 26, 1246, 12, 'O-');
+    INSERT INTO Mechanic VALUES (929, 'Richie King', 310, 31, 4821, 8, 'AB+');
+
+16: INSERT INTO Event VALUES ('Brands Hatch', 2018, 'England');
+    INSERT INTO Event VALUES ('Donington Park', 2018, 'England');
+    INSERT INTO Event VALUES ('Silverstone', 2017, 'England');
+    INSERT INTO Event VALUES ('Monaco Grand Prix', 2018, 'Monaco');
+    INSERT INTO Event VALUES ('Mondello', 2017, 'Ireland');
+    INSERT INTO Event VALUES ('Anglesey', 2017, 'England');
+
+17: INSERT INTO Driver_result VALUES ('Brands Hatch', 2018, 1246, 1);
+    INSERT INTO Driver_result VALUES ('Brands Hatch', 2018, 1283, 2);
+    INSERT INTO Driver_result VALUES ('Silverstone', 2017, 1246, 3);
+    INSERT INTO Driver_result VALUES ('Anglesey', 2017, 521, 1);
+    INSERT INTO Driver_result VALUES ('Mondello', 2017, 904, 2);
+    INSERT INTO Driver_result VALUES ('Mondello', 2017, 382, 1);
+    INSERT INTO Driver_result VALUES ('Donington Park', 2018, 294, 3);
+
+18: INSERT INTO Car_Race VALUES ('Brands Hatch', 2018, 12);
+    INSERT INTO Car_Race VALUES ('Brands Hatch', 2018, 4);
+    INSERT INTO Car_Race VALUES ('Silverstone', 2017, 12);
+    INSERT INTO Car_Race VALUES ('Anglesey', 2017, 1);
+    INSERT INTO Car_Race VALUES ('Mondello', 2017, 3);
+    INSERT INTO Car_Race VALUES ('Mondello', 2017, 2);
+    INSERT INTO Car_Race VALUES ('Donington Park', 2018, 6);
+
+
+/********************************************************************************************************/
+Triggers
+/***********/
+
+
+19:   
+DELIMITER $$
+
+CREATE TRIGGER blood_update_check_driver  
+BEFORE UPDATE ON Driver
+FOR EACH ROW BEGIN
+    IF (NEW.Blood_type != OLD.Blood_type) THEN 
+        SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Warning: cannot change blood type';
+    END IF;
+END$$
+
+DELIMITER ;
+
+20:
+DELIMITER $$
+
+CREATE TRIGGER blood_update_check_mechanic 
+BEFORE UPDATE ON Mechanic
+FOR EACH ROW BEGIN
+    IF (NEW.Blood_type != OLD.Blood_type) THEN 
+        SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Warning: cannot change blood type';
+    END IF;
+END$$
+
+DELIMITER ;
+
+
+
+/********************************************************************************************************/
+View
+/***************/
+
+CREATE VIEW Driver_name_and_results AS SELECT Name, Driver.Driver_num, Track_name, Year, Position FROM Driver, Driver_result WHERE Driver.Driver_num = Driver_result.Driver_num;
+
+/*****************************/
+Roles
+/**********/
+
+* CREATE ROLE Race_Official IDENTIFIED BY pirelli;
+
+* GRANT CREATE TO Race_Official;
+* GRANT UPDATE TO Race_Official;
+* GRANT DELETE TO Race_Official;
+
+* CREATE ROLE Public_member;
+
+* GRANT SELECT TO Public_member;
+* REVOKE SELECT(Blood_type), SELECT (Owner), SELECT (Street), SELECT (Town) FROM Public_member;
+
+* GRANT Race_Official to official_1;
+* GRANT Public_member to public_1;
+
+
+
+
+
+
+
+/*
+*
+*
+*SELECT Driver.Driver_num, Driver.name, Car.Car_ID, Car.Engine_num FROM Driver LEFT JOIN Car ON Driver.Driver_num = Car.Driver_num ORDER BY Driver.Driver_num;
+*
+*SELECT Team.name, Driver.name FROM Team LEFT JOIN Driver on Driver.Team_ID = Team.Team_ID ORDER BY Team.name;
+*
+*
+*UPDATE Driver SET Age = 29 WHERE Name = 'Tim Parker';
+ UPDATE Driver SET Name = 'Joe Maden' WHERE Name = 'Tim Parker';
+ UPDATE Driver SET Age = 28 WHERE Name = 'Joe Maden';
+ UPDATE Driver SET Name = 'Tim Parker' WHERE Name = 'Joe Maden';
+
+SELECT * FROM Drivers;
+*
+*
+*
+*
+*
+*
+*
+*
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+* = YET TO RUN
